@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>jqCtxMenu Demo</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/jqctxmenu.css" />
+    <script type="text/javascript" src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="scripts/jqctxmenu.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            "use strict";
+
+            $("#active-area").jqCtxMenu([{
+                name: "Option 1",
+                action: function() { console.log("Option 1"); }
+            }, {
+                name: "Option 2",
+                icon: "img/icon.png",
+                group: true,
+                menu: [{
+                    name: "Sub opt 1",
+                    location: "http://google.com"
+                }, {
+                    name: "Sub opt 2",
+                    menu: [{
+                        name: "A long sub option 3",
+                        icon: "img/icon.png",
+                        action: function() { console.log("Last option"); }
+                    }]
+                }]
+            }, {
+                name: "Option 3",
+                group: true,
+                action: function() { console.log("Option 3"); }
+            }, {
+                name: "Option 4",
+                icon: "img/icon.png",
+                action: function() { console.log("Option 4"); }
+            }, {
+                name: "Option 5",
+                action: function() { console.log("Option 5"); }
+            }]);
+
+        });
+    </script>
+</head>
+<body>
+    <section id="active-area"></section>
+</body>
+</html>
