@@ -17,22 +17,27 @@
             }, {
                 name: "Option 2",
                 icon: "img/icon.png",
-                group: true,
                 menu: [{
-                    name: "Sub opt 1",
+                    name: "Option 2.1",
                     location: "http://google.com"
                 }, {
-                    name: "Sub opt 2",
+                    name: "Option 2.2",
                     menu: [{
-                        name: "A long sub option 3",
+                        name: "Option 2.2.1",
                         icon: "img/icon.png",
                         action: function() { console.log("Last option"); }
                     }]
                 }]
             }, {
                 name: "Option 3",
-                group: true,
-                action: function() { console.log("Option 3"); }
+                menu: [{
+                    name: "Option 3.1 xxxxxxxxxxxxxxx",
+                    menu: [{
+                        name: "Option 3.1.1"
+                    }]
+                }, {
+                    name: "Option 3.2"
+                }]
             }, {
                 name: "Option 4",
                 icon: "img/icon.png",

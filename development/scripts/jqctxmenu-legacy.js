@@ -24,39 +24,13 @@
         name = "name",
         action = "action",
         context = {},
-        $currentContainer = $("#" + CTX_CONTAINER),
+        $container = $("#" + CTX_CONTAINER),
+        menus = [],
         totalCtxWidth = 0,
         initPadding = false,
         paddingXOffset,
         paddingYOffset,
-        $currentMenu,
-        $mainMenu,
-        Queue,
-        menus;
-
-    Queue = (function() {
-        function Queue() {
-            this._container = [];
-        }
-
-        Queue.prototype.isEmpty = function() {
-            return !this._container.length;
-        };
-
-        Queue.prototype.length = function() {
-            return this._container.length;
-        };
-
-        Queue.prototype.enqueue = function(obj) {
-            this._container.push(obj);
-        };
-
-        Queue.prototype.dequeue = function() {
-            return this._container.shift();
-        };
-
-        return Queue;
-    }());
+        $menu;
 
     context.isValid = function(prop, i) {
         if (!this.options[i][prop]) {
@@ -68,7 +42,7 @@
 
     context.bindInitialEvent = function() {
         $(document).mousedown(function() {
-            $currentContainer.find("> ." + CTX_CLASS).hide();
+            $container.find("> ." + CTX_CLASS).hide();
         });
     };
 
@@ -78,28 +52,75 @@
         if (!$(CTX_CONTAINER).length) {
             container = $("<div>").attr("id", CTX_CONTAINER);
             $("body").append(container);
-            $currentContainer = $("#" + CTX_CONTAINER);
+            $container = $("#" + CTX_CONTAINER);
 
             this.bindInitialEvent();
         }
     };
 
+    // Needed for determining CSS padding
+    context.setPaddingOffset = function() {
+        var paddingLeftString = $menu.find("li").css("padding-left"),
+            paddingTopString = $menu.find("li").css("padding-top");
+
+        paddingLeftString = paddingLeftString.replace("px", "");
+        paddingTopString = paddingTopString.replace("px", "");
+
+        paddingXOffset = parseInt(paddingLeftString);
+        paddingYOffset = parseInt(paddingTopString);
+    };
 
     // Build methods
 
-    context.buildMenu = function(init) {
+    context.buildMenu = function(container, isSubmenu, currentMenu) {
+        container = container || $container;
+        isSubmenu = isSubmenu || false;
+
         var menu = $("<ul>").addClass(CTX_CLASS),
-            newMenu;
+            menuLen = menus.length,
+            newMenu,
+            xMargin;
 
-        $currentContainer.append(menu);
+        container.append(menu);
 
-        if (init) {
-            $mainMenu = $currentContainer.find(menu);
+        // Determines whether the menu should be appended to main one
+        // or to the last added submenu
+        if (!isSubmenu) {
+            $menu = container.find(menu);
+            return null;
         } else {
-            newMenu = $currentContainer.find(menu);
-            newMenu.css({ "margin-left": $currentContainer.width() });
+            if (menuLen === 0) {
+                xMargin = $menu.outerWidth();
+            } else {
+                if (menus.length === 1) {
+                    xMargin = menus[0].obj.outerWidth();
+                } else {
+                    xMargin = menus[menus.length - 1].parent.obj.outerWidth();
+                }
+            }
 
-            $currentMenu = newMenu;
+            // WARNING: Needed for determining menu position on RMB click later
+            totalCtxWidth += xMargin;
+
+            newMenu = {
+                obj: container.find(menu),
+                xMargin: xMargin,
+                yMargin: $menu.find("li").outerHeight(),
+                parent: currentMenu
+            };
+
+            menus.push(newMenu);
+
+            return newMenu;
+        }
+    };
+
+    // Determines where the option must be added
+    context.appendOption = function(isSubmenu, option, currentMenu) {
+        if (!isSubmenu) {
+            $menu.append(option);
+        } else {
+            currentMenu.obj.append(option);
         }
     };
 
@@ -117,14 +138,22 @@
         }
 
         optContainer.append(title);
+
+        return optContainer.find(title);
     };
 
     // Adds an option to the menu that is currently being built
-    context.addOption = function(option, init) {
+    context.addOption = function(option, isSubmenu, currentMenu) {
+        isSubmenu = isSubmenu || false;
+
         var optContainer = $("<li>"),
+            contentWidth,
+            $currentTitle,
+            submenuCont,
+            newMenu,
             submenu;
 
-        context.buildOption(optContainer, option);
+        $currentTitle = context.buildOption(optContainer, option);
 
         /*
          * Action priority:
@@ -141,50 +170,51 @@
             });
         }
         else if (option.menu) {
+            context.appendOption(isSubmenu, optContainer, currentMenu);
+
             submenu = $("<div>").addClass(CTX_SUB_CLASS);
             optContainer.append(submenu);
+
+            contentWidth = $currentTitle.outerWidth() + CTX_ARROW_OFFSET + paddingXOffset * 2;
+            if (contentWidth < optContainer.outerWidth()) {
+                optContainer.addClass(CTX_ARROW_TW_CLASS);
+            }
+
             optContainer.addClass(CTX_ARROW_CLASS);
+            submenuCont = optContainer.find(submenu);
 
-            menus.enqueue({
-                container: optContainer.find(submenu),
-                options: option.menu
-            });
+            newMenu = context.buildMenu($menu.find(submenuCont), true, currentMenu);
+            context.loadMenu(option.menu, true, newMenu);
+
+            return;
         }
 
-        // Append
-        if (init) {
-            $mainMenu.append(optContainer);
-        } else {
-            $currentMenu.append(optContainer);
-        }
+        context.appendOption(isSubmenu, optContainer, currentMenu);
     };
 
-    context.loadMenu = function(init) {
-        var i = 0,
-            dequeuedMenu;
+    context.loadMenu = function(options, isSubmenu, currentMenu) {
+        options = options || this.options;
+        isSubmenu = isSubmenu || false;
+
+        var i = 0;
 
         // Iterates throw all of the menu options and appends them
         // Note: The name is mandatory
-        for (i; i < this.options.length; i += 1) {
+        for (i; i < options.length; i += 1) {
             this.isValid(name, i);
-            this.addOption(this.options[i], init);
-        }
+            this.addOption(options[i], isSubmenu, currentMenu);
 
-        if (!menus.isEmpty()) {
-            dequeuedMenu = menus.dequeue();
-
-            this.options = dequeuedMenu.options;
-            $currentContainer = dequeuedMenu.container;
-
-            this.buildMenu();
-            this.loadMenu();
+            if (!initPadding) {
+                context.setPaddingOffset();
+                initPadding = true;
+            }
         }
     };
 
     context.determineDirections = function(page) {
         var windowX = $(window).innerWidth(),
             windowY = $(window).innerHeight(),
-            ctxHeight = $mainMenu.outerHeight(), // TODO: Integrate with all menus
+            ctxHeight = $menu.outerHeight(), // TODO: Integrate with all menus
             directions = { x: "", y: "" };
 
         // Calculate X
@@ -215,36 +245,46 @@
         directions = context.determineDirections(page);
 
         if (directions.x === "left") {
-            mainMenu.left = (page.x + CTX_X_OFFSET) - $mainMenu.outerHeight();
+            mainMenu.left = (page.x + CTX_X_OFFSET) - $menu.outerHeight();
         } else {
             mainMenu.left = page.x + CTX_X_OFFSET;
         }
 
         if (directions.y === "up") {
-            mainMenu.top = (page.y) - $mainMenu.outerWidth();
+            mainMenu.top = (page.y) - $menu.outerWidth();
         } else {
             mainMenu.top = page.y + CTX_Y_OFFSET;
         }
 
-        $mainMenu.css({
+        $menu.css({
             top: mainMenu.top,
             left: mainMenu.left
         });
 
-//        for (i; i < menus.length; i++) {
-//            current = menus[i];
-//
-//            if (directions.x === "left") {
-//                subMenus.left = -current.obj.outerWidth() + CTX_X_OFFSET;
-//            } else {
-//                subMenus.left = current.xMargin - CTX_X_OFFSET;
-//            }
-//
-//            current.obj.css({
-//                marginLeft: subMenus.left - paddingXOffset,
-//                marginTop: -current.yMargin + paddingYOffset
-//            });
-//        }
+        for (i; i < menus.length; i++) {
+            current = menus[i];
+
+            if (directions.x === "left") {
+                subMenus.left = -current.obj.outerWidth() + CTX_X_OFFSET;
+            } else {
+                subMenus.left = current.xMargin - CTX_X_OFFSET;
+            }
+
+            current.obj.css({
+                marginLeft: subMenus.left - paddingXOffset,
+                marginTop: -current.yMargin + paddingYOffset
+            });
+        }
+    };
+
+    context.finishTotalCtxWidthCalculation = function() {
+        var menuLen = menus.length;
+
+        if (menuLen === 0) {
+            totalCtxWidth = $menu.outerWidth();
+        } else {
+            totalCtxWidth += menus[menuLen - 1].obj.outerWidth();
+        }
     };
 
     // Plugin
@@ -252,13 +292,11 @@
         var $this = $(this),
             isInitSet = false;
 
-        menus = new Queue();
-
         context.options = options;
         context.buildInitialContainer();
-
-        context.buildMenu(true);
-        context.loadMenu(true);
+        context.buildMenu();
+        context.loadMenu();
+        context.finishTotalCtxWidthCalculation();
 
         // Disable the default context menu
         $this.bind("contextmenu", function() {
@@ -270,9 +308,9 @@
                 context.positionMenu({ y: e.pageY, x: e.pageX });
 
                 if (isInitSet) {
-                    $mainMenu.fadeIn();
+                    $menu.fadeIn();
                 } else {
-                    $mainMenu.css("visibility", "visible");
+                    $menu.css("visibility", "visible");
                     isInitSet = true;
                 }
 
