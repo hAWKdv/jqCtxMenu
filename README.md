@@ -1,2 +1,2 @@
-jqCtxMenu
-=========
+![alt tag](misc/logo.png)
+=========================
