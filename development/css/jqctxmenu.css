@@ -65,6 +65,7 @@ ul.jqctx img {
     position: absolute;
     width: 100%;
     visibility: hidden;
+    margin-top: -25px;
 }
 
 .jqctx-arrow:after {

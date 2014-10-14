@@ -24,11 +24,9 @@
         name = "name",
         action = "action",
         context = {},
-        $currentContainer = $("#" + CTX_CONTAINER),
+        $mainContainer = $("#" + CTX_CONTAINER),
+        $currentContainer = $mainContainer,
         totalCtxWidth = 0,
-        initPadding = false,
-        paddingXOffset,
-        paddingYOffset,
         $currentMenu,
         $mainMenu,
         Queue,
@@ -64,11 +62,11 @@
         }
     };
 
-    // On initialization methods
+    // On initialization functions
 
     context.bindInitialEvent = function() {
         $(document).mousedown(function() {
-            $currentContainer.find("> ." + CTX_CLASS).hide();
+            $mainContainer.find("> ." + CTX_CLASS).hide();
         });
     };
 
@@ -78,28 +76,25 @@
         if (!$(CTX_CONTAINER).length) {
             container = $("<div>").attr("id", CTX_CONTAINER);
             $("body").append(container);
-            $currentContainer = $("#" + CTX_CONTAINER);
+            $mainContainer = $("#" + CTX_CONTAINER);
+            $currentContainer = $mainContainer;
 
             this.bindInitialEvent();
         }
     };
 
 
-    // Build methods
+    // Build functions
 
     context.buildMenu = function(init) {
-        var menu = $("<ul>").addClass(CTX_CLASS),
-            newMenu;
+        var menu = $("<ul>").addClass(CTX_CLASS);
 
         $currentContainer.append(menu);
 
         if (init) {
             $mainMenu = $currentContainer.find(menu);
         } else {
-            newMenu = $currentContainer.find(menu);
-            newMenu.css({ "margin-left": $currentContainer.width() });
-
-            $currentMenu = newMenu;
+            $currentMenu = $currentContainer.find(menu);
         }
     };
 
@@ -117,6 +112,38 @@
         }
 
         optContainer.append(title);
+    };
+
+    context.determineTotalWidth = function() {
+        var queue = new Queue(),
+            maxWidthElement,
+            maxWidth,
+            current;
+
+        queue.enqueue($mainMenu);
+
+        while (!queue.isEmpty()) {
+            current = queue.dequeue();
+
+            totalCtxWidth += current.width();
+
+            maxWidth = 0;
+            maxWidthElement = null;
+            current.find("> li > ." + CTX_SUB_CLASS + " > ." + CTX_CLASS)
+                .each(function() {
+                    var $this = $(this),
+                        thisWidth = $this.width();
+
+                    if (thisWidth > maxWidth) {
+                        maxWidth = thisWidth;
+                        maxWidthElement = $this;
+                    }
+                });
+
+            if (maxWidthElement) {
+                queue.enqueue(maxWidthElement);
+            }
+        }
     };
 
     // Adds an option to the menu that is currently being built
@@ -206,18 +233,26 @@
 
     // Applies new position on RMB click
     context.positionMenu = function(page) {
-        var i = 0,
-            mainMenu = {},
-            subMenus = {},
-            directions,
-            current;
+        var mainMenu = {},
+            $subMenu = $("." + CTX_SUB_CLASS + " > ." + CTX_CLASS),
+            directions;
 
         directions = context.determineDirections(page);
 
         if (directions.x === "left") {
-            mainMenu.left = (page.x + CTX_X_OFFSET) - $mainMenu.outerHeight();
+            mainMenu.left = (page.x + CTX_X_OFFSET) - $mainMenu.outerHeight() + 35; //TODO: Extract const
+
+            $subMenu.each(function() {
+                var $this = $(this);
+                $this.css({ "margin-left": - ($this.width() + 10) }); // TODO: Extract const
+            });
         } else {
             mainMenu.left = page.x + CTX_X_OFFSET;
+
+            $subMenu.each(function() {
+                var $this = $(this);
+                $this.css({ "margin-left": $this.closest("." + CTX_SUB_CLASS).width() - 10 }); // TODO: Extract const
+            });
         }
 
         if (directions.y === "up") {
@@ -230,21 +265,6 @@
             top: mainMenu.top,
             left: mainMenu.left
         });
-
-//        for (i; i < menus.length; i++) {
-//            current = menus[i];
-//
-//            if (directions.x === "left") {
-//                subMenus.left = -current.obj.outerWidth() + CTX_X_OFFSET;
-//            } else {
-//                subMenus.left = current.xMargin - CTX_X_OFFSET;
-//            }
-//
-//            current.obj.css({
-//                marginLeft: subMenus.left - paddingXOffset,
-//                marginTop: -current.yMargin + paddingYOffset
-//            });
-//        }
     };
 
     // Plugin
@@ -259,6 +279,7 @@
 
         context.buildMenu(true);
         context.loadMenu(true);
+        context.determineTotalWidth();
 
         // Disable the default context menu
         $this.bind("contextmenu", function() {
