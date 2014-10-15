@@ -35,6 +35,7 @@ $("#my-selector").jqCtxMenu([{
     location: "https://github.com"
 }]);
 ```
+[Demo]
 
 Adding the plugin to your project
 -----------
@@ -111,6 +112,10 @@ var options = [{
     }]
 }];
 ```
+[Main functionality demo]
+
+[Deep nesting demo]
+
 It is recommended to use variables for keeping the sub-menus in order to avoid christmas-tree-like structure of the code.
 
 #####2. Visualization properties
@@ -139,8 +144,14 @@ var options = [{
     // ...
 }];
 ```
+[Visualization demo]
 
 License
 ----
 
 MIT
+
+[Demo]: http://htmlpreview.github.io/?https://raw.githubusercontent.com/hAWKdv/jqCtxMenu/master/demos/simple-demo.html
+[Main functionality demo]: http://htmlpreview.github.io/?https://raw.githubusercontent.com/hAWKdv/jqCtxMenu/master/demos/functionality.html
+[Deep nesting demo]: http://htmlpreview.github.io/?https://raw.githubusercontent.com/hAWKdv/jqCtxMenu/master/demos/deep-nesting.html
+[Visualization demo]: http://htmlpreview.github.io/?https://raw.githubusercontent.com/hAWKdv/jqCtxMenu/master/demos/visualization.html
