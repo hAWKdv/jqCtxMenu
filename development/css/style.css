@@ -1,6 +1,25 @@
+body {
+    font-family: Arial, Tahoma;
+}
+
+p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+a {
+    color: #4183c4;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+a:hover {
+    border-bottom: 2px dotted #4183c4;
+}
+
 section#active-area {
     position: relative;
-    font-family: Arial, Tahoma;
     background: #fff392;
     border: 3px dashed #F00;
     width: 80%; height: auto;

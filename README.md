@@ -123,7 +123,7 @@ You can attach an ```icon``` to your option or ```group``` it logically with oth
 * 1. ```icon``` property - just add the URL to the image as a value:
 
 ```javascript
-var option = [{
+var options = [{
     name: "Send",
     icon: "img/send_16x16.png",
     // ...
