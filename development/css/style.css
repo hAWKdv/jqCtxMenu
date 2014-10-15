@@ -1,8 +1,14 @@
 section#active-area {
     position: relative;
+    font-family: Arial, Tahoma;
     background: #fff392;
     border: 3px dashed #F00;
-    width: 80%; height: 500px;
+    width: 80%; height: auto;
     margin: 0 auto;
     margin-top: 100px;
+    padding: 230px 0;
+    color: #F00;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
 }

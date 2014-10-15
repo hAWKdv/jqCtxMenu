@@ -1,7 +1,7 @@
 ![jqCtxMenu](misc/logo.png)
 ===========================
 
-> *A simple jQuery plugin which provides context menu control*
+> *A simple jQuery plugin which provides a context menu control*
 
 Latest Version
 ----
@@ -44,11 +44,11 @@ You need to jQuery to your project in order to run the plugin. It is recommended
 
 * If you have already downloaded a complete pack from ```Releases``` proceed to point 4
 
-#####2. Pick the desired version of the plugin from ```releases``` folder
+#####2. Pick the desired version of the plugin from ```releases``` folder.
 
-#####3. Pick a theme for the plugin from ```themes``` folder
+#####3. Pick a theme for the plugin from ```themes``` folder.
 
-#####4. Add the plugin to your project
+#####4. Add the plugin to your project.
 You should just add the two corresponding lines to your code:
 
 ```html
@@ -89,7 +89,7 @@ The action type represents the onclick event of the respective option. There are
 * Location (Redirects to the specified URL)
 * Sub-menu - Sub-menus are basicaly an options array (menu) within an option object 
 
-**Note:** The action type priority is as displayed in the list above. So if you use more than one of them in your option object the latter will be overriden by the former.
+**Note:** The action type priority is as displayed in the list above. So if you use more than one of them in your option object the latter will be overridden by the former.
 
 ```javascript
 var options = [{
@@ -99,7 +99,7 @@ var options = [{
 }, {
     name: "Go to profile",
     // Location
-    location: "/users/profile"
+    location: "users/profile"
 }, {
     name: "Files",
     menu: [{

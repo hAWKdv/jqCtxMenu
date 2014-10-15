@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Deep nesting</title>
+    <link rel="stylesheet" href="../development/css/style.css" />
+    <link rel="stylesheet" href="../development/css/jqctxmenu.css" />
+    <script type="text/javascript" src="../development/libs/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../development/scripts/jqctxmenu.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            "use strict";
+
+            // The following doesn't have action
+            $("#active-area").jqCtxMenu([{
+                name: "Option 1"
+            }, {
+                name: "Option 2",
+                menu: [{
+                    name: "Option 2.1"
+                }, {
+                    name: "Option 2.2",
+                    menu: [{
+                        name: "Option: 2.2.1"
+                    }]
+                }, {
+                    name: "Option 2.3"
+                }]
+            }, {
+                name: "Option 3"
+            }, {
+                name: "Option 4",
+                menu: [{
+                    name: "Option 4.1",
+                    menu: [{ name: "Option: 4.1.1" }]
+                }, {
+                    name: "Option 4.2",
+                    menu: [{
+                        name: "Option 4.2.1",
+                        menu: [{ name: "Option 4.2.1.1" }]
+                    }]
+                }]
+            }]);
+        });
+    </script>
+</head>
+<body>
+    <section id="active-area">Active Area</section>
+</body>
+</html>

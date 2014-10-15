@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Simple menu</title>
+    <link rel="stylesheet" href="../development/css/style.css" />
+    <link rel="stylesheet" href="../development/css/jqctxmenu.css" />
+    <script type="text/javascript" src="../development/libs/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../development/scripts/jqctxmenu.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            "use strict";
+
+            var fooAction,
+                barAction;
+
+            fooAction = function() {
+                alert("fooAction triggered!");
+            };
+
+            barAction = function() {
+                alert("barAction triggered!");
+            };
+
+
+            $("#active-area").jqCtxMenu([{
+                name: "Option 1",
+                action: fooAction
+            }, {
+                name: "Option 2",
+                action: barAction
+            }, {
+                name: "Option 3",
+                location: "https://github.com/hAWKdv/jqCtxMenu"
+            }]);
+        });
+    </script>
+</head>
+<body>
+    <section id="active-area">Active Area</section>
+</body>
+</html>

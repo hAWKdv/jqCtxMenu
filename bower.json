@@ -5,7 +5,7 @@
   "authors": [
     "hAWK"
   ],
-  "description": "A simple jQuery plugin which provides context menu control.",
+  "description": "A simple jQuery plugin which provides a context menu control.",
   "moduleType": [
     "amd",
     "globals"

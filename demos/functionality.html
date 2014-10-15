@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Functionality</title>
+    <link rel="stylesheet" href="../development/css/style.css" />
+    <link rel="stylesheet" href="../development/css/jqctxmenu.css" />
+    <script type="text/javascript" src="../development/libs/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../development/scripts/jqctxmenu.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            "use strict";
+
+            var menuOptions,
+                subMenu;
+
+            // The following doesn't have action
+            subMenu = [{
+                name: "Create new file"
+            }, {
+                name: "Modify current file"
+            }];
+
+            menuOptions = [{
+                name: "Print message",
+                // Function or action
+                action: function() { alert("Hello world!"); }
+            }, {
+                name: "Go to profile",
+                // Location
+                location: "users/profile"
+            }, {
+                name: "Files",
+                menu: subMenu
+            }];
+
+            $("#active-area").jqCtxMenu(menuOptions);
+        });
+    </script>
+</head>
+<body>
+    <section id="active-area">Active Area</section>
+</body>
+</html>
