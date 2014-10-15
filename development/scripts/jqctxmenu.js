@@ -1,6 +1,6 @@
 /*
  * jqCtxMenu - a jQuery plugin
- * 1.0-alpha
+ * 1.0-beta
  * Copyright 2014
  * All Rights Reserved.
  * Use, reproduction, distribution, and modification of this code is subject to the terms and
@@ -15,20 +15,20 @@
     var RMB = 2,
         CTX_X_OFFSET = 2,
         CTX_Y_OFFSET = -15,
-        CTX_ARROW_OFFSET = 16,
         CTX_CONTAINER = "jqctx-container",
         CTX_CLASS = "jqctx",
         CTX_SUB_CLASS = "jqctx-sub",
         CTX_ARROW_CLASS = "jqctx-arrow",
-        CTX_ARROW_TW_CLASS = "tw-arrow",
         name = "name",
         action = "action",
         context = {},
         $mainContainer = $("#" + CTX_CONTAINER),
         $currentContainer = $mainContainer,
         totalCtxWidth = 0,
+        paddingXOffset,
         $currentMenu,
         $mainMenu,
+        $subMenu,
         Queue,
         menus;
 
@@ -83,6 +83,50 @@
         }
     };
 
+    // Finalization functions
+
+    context.finalizeSetting = function() {
+        $subMenu = $("." + CTX_SUB_CLASS + " > ." + CTX_CLASS);
+        paddingXOffset = $("." + CTX_CLASS).find("> li").css("padding-left").replace("px", "");
+        paddingXOffset = parseInt(paddingXOffset);
+    };
+
+    context.determineTotalWidth = function() {
+        var queue = new Queue(),
+            pathWidths = [],
+            currentWidth,
+            children,
+            currentEl;
+
+        queue.enqueue({
+            widthSoFar: 0,
+            menu: $mainMenu
+        });
+
+        while (!queue.isEmpty()) {
+            currentEl = queue.dequeue();
+            children = false;
+
+            currentWidth = currentEl.widthSoFar + currentEl.menu.width();
+
+            currentEl.menu.find("> li > ." + CTX_SUB_CLASS + " > ." + CTX_CLASS)
+                .each(function() {
+                    children = true;
+
+                    queue.enqueue({
+                        widthSoFar: currentWidth,
+                        menu: $(this)
+                    });
+                });
+
+            if (!children) {
+                pathWidths.push(currentWidth);
+            }
+        }
+
+        totalCtxWidth = Math.max.apply(null, pathWidths);
+    };
+
 
     // Build functions
 
@@ -114,42 +158,10 @@
         optContainer.append(title);
     };
 
-    context.determineTotalWidth = function() {
-        var queue = new Queue(),
-            maxWidthElement,
-            maxWidth,
-            current;
-
-        queue.enqueue($mainMenu);
-
-        while (!queue.isEmpty()) {
-            current = queue.dequeue();
-
-            totalCtxWidth += current.width();
-
-            maxWidth = 0;
-            maxWidthElement = null;
-            current.find("> li > ." + CTX_SUB_CLASS + " > ." + CTX_CLASS)
-                .each(function() {
-                    var $this = $(this),
-                        thisWidth = $this.width();
-
-                    if (thisWidth > maxWidth) {
-                        maxWidth = thisWidth;
-                        maxWidthElement = $this;
-                    }
-                });
-
-            if (maxWidthElement) {
-                queue.enqueue(maxWidthElement);
-            }
-        }
-    };
-
     // Adds an option to the menu that is currently being built
     context.addOption = function(option, init) {
         var optContainer = $("<li>"),
-            submenu;
+            subMenu;
 
         context.buildOption(optContainer, option);
 
@@ -168,12 +180,12 @@
             });
         }
         else if (option.menu) {
-            submenu = $("<div>").addClass(CTX_SUB_CLASS);
-            optContainer.append(submenu);
+            subMenu = $("<div>").addClass(CTX_SUB_CLASS);
+            optContainer.prepend(subMenu);
             optContainer.addClass(CTX_ARROW_CLASS);
 
             menus.enqueue({
-                container: optContainer.find(submenu),
+                container: optContainer.find(subMenu),
                 options: option.menu
             });
         }
@@ -197,6 +209,12 @@
             this.addOption(this.options[i], init);
         }
 
+        if (init) {
+            $mainMenu.data("width", $mainMenu.width());
+        } else {
+            $currentMenu.data("width", $currentMenu.width());
+        }
+
         if (!menus.isEmpty()) {
             dequeuedMenu = menus.dequeue();
 
@@ -207,6 +225,9 @@
             this.loadMenu();
         }
     };
+
+
+    // On RMB click functions
 
     context.determineDirections = function(page) {
         var windowX = $(window).innerWidth(),
@@ -234,29 +255,28 @@
     // Applies new position on RMB click
     context.positionMenu = function(page) {
         var mainMenu = {},
-            $subMenu = $("." + CTX_SUB_CLASS + " > ." + CTX_CLASS),
             directions;
 
         directions = context.determineDirections(page);
 
         if (directions.x === "left") {
-            mainMenu.left = (page.x + CTX_X_OFFSET) - $mainMenu.outerHeight() + 35; //TODO: Extract const
+            mainMenu.left = (page.x + CTX_X_OFFSET - paddingXOffset / 2) - $mainMenu.width();
 
             $subMenu.each(function() {
                 var $this = $(this);
-                $this.css({ "margin-left": - ($this.width() + 10) }); // TODO: Extract const
+                $this.css({ marginLeft: - ($this.data("width") + paddingXOffset) });
             });
         } else {
             mainMenu.left = page.x + CTX_X_OFFSET;
 
             $subMenu.each(function() {
                 var $this = $(this);
-                $this.css({ "margin-left": $this.closest("." + CTX_SUB_CLASS).width() - 10 }); // TODO: Extract const
+                $this.css({ marginLeft: $this.parent().closest("." + CTX_CLASS).data("width") - paddingXOffset });
             });
         }
 
         if (directions.y === "up") {
-            mainMenu.top = (page.y) - $mainMenu.outerWidth();
+            mainMenu.top = (page.y) - $mainMenu.outerWidth() + CTX_Y_OFFSET;
         } else {
             mainMenu.top = page.y + CTX_Y_OFFSET;
         }
@@ -279,6 +299,7 @@
 
         context.buildMenu(true);
         context.loadMenu(true);
+        context.finalizeSetting();
         context.determineTotalWidth();
 
         // Disable the default context menu
