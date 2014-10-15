@@ -1,11 +1,11 @@
 {
   "name": "jqCtxMenu",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/hAWKdv/jqCtxMenu",
   "authors": [
     "hAWK"
   ],
-  "description": "A simple jQuery plugin which provides context menu functionality.",
+  "description": "A simple jQuery plugin which provides context menu control.",
   "moduleType": [
     "amd",
     "globals"
