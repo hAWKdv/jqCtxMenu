@@ -1,7 +1,7 @@
 ![jqCtxMenu](misc/logo.png)
 ===========================
 
-> A simple jQuery plugin which provides context menu control
+> *A simple jQuery plugin which provides context menu control*
 
 Latest Version
 ----
@@ -39,16 +39,16 @@ $("#my-selector").jqCtxMenu([{
 Adding the plugin to your project
 -----------
 
-####1. Get the latest version of jQuery.
+#####1. Get the latest version of jQuery.
 You need to jQuery to your project in order to run the plugin. It is recommended to pick the latest version since the project is being developed on it.
 
 * If you have already downloaded a complete pack from ```Releases``` proceed to point 4
 
-####2. Pick the desired version of the plugin from ```releases``` folder
+#####2. Pick the desired version of the plugin from ```releases``` folder
 
-####3. Pick a theme for the plugin from ```themes``` folder
+#####3. Pick a theme for the plugin from ```themes``` folder
 
-####4. Add the plugin to your project
+#####4. Add the plugin to your project
 You should just add the two corresponding lines to your code:
 
 ```html
@@ -56,7 +56,7 @@ You should just add the two corresponding lines to your code:
 <link rel="stylesheet" href="path_to_css/jqctxmenu.css" />
 ```
 
-#####Please note that the script should be added after the jQuery library.
+**Please note that the script should be added after the jQuery library.**
 
 Using the plugin
 ----------------
@@ -70,7 +70,7 @@ $("#ctx-area").jqCtxMenu(menuOptions);
 
 Functionality
 -------------
-####1. Options and their action types
+#####1. Options and their action types
 Every context menu is composed by an array of options where every option is represented by an object. Each option has a name and an action type (Note that the name is mandatory for visualization purposes). Here is a small example of how one option array looks like:
 
 ```javascript
@@ -86,7 +86,7 @@ var options = [{
 ```
 The action type represents the onclick event of the respective option. There are three action types:
 * Function (a.k.a. ```action```)
-* Location (Redirects to the specified Ull)
+* Location (Redirects to the specified URL)
 * Sub-menu - Sub-menus are basicaly an options array (menu) within an option object 
 
 **Note:** The action type priority is as displayed in the list above. So if you use more than one of them in your option object the latter will be overriden by the former.
@@ -113,7 +113,7 @@ var options = [{
 ```
 It is recommended to use variables for keeping the sub-menus in order to avoid christmas-tree-like structure of the code.
 
-####2. Visualization properties
+#####2. Visualization properties
 You can attach an ```icon``` to your option or ```group``` it logically with other options.
 * 1. ```icon``` property - just add the URL to the image as a value:
 
