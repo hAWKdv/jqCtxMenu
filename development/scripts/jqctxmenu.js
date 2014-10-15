@@ -32,6 +32,8 @@
         Queue,
         menus;
 
+    // >> Helpers
+
     Queue = (function() {
         function Queue() {
             this._container = [];
@@ -56,13 +58,17 @@
         return Queue;
     }());
 
+
+    // >> Validation
+
     context.isValid = function(prop, i) {
         if (!this.options[i][prop]) {
             throw new Error(prop + " is mandatory for context menu object.");
         }
     };
 
-    // On initialization functions
+
+    // >> On initialization functions
 
     context.bindInitialEvent = function() {
         $(document).mousedown(function() {
@@ -83,14 +89,20 @@
         }
     };
 
-    // Finalization functions
+
+    // >> Finalization functions
 
     context.finalizeSetting = function() {
+        // Sets the sub-menu selector (used for positioning)
         $subMenu = $("." + CTX_SUB_CLASS + " > ." + CTX_CLASS);
+
+        // Gets the default option padding
         paddingXOffset = $("." + CTX_CLASS).find("> li").css("padding-left").replace("px", "");
         paddingXOffset = parseInt(paddingXOffset);
     };
 
+    // Determines the longest possible context menu width with all sub-menus opened
+    // BFS-based
     context.determineTotalWidth = function() {
         var queue = new Queue(),
             pathWidths = [],
@@ -128,8 +140,9 @@
     };
 
 
-    // Build functions
+    // >> Build functions
 
+    // Creates a new menu container
     context.buildMenu = function(init) {
         var menu = $("<ul>").addClass(CTX_CLASS);
 
@@ -142,6 +155,7 @@
         }
     };
 
+    // Visual built of the option - title, icon, etc.
     context.buildOption = function(optContainer, optData) {
         var title = $("<span>").text(optData.name),
             icon;
@@ -190,7 +204,7 @@
             });
         }
 
-        // Append
+        // Append the newly built option
         if (init) {
             $mainMenu.append(optContainer);
         } else {
@@ -198,6 +212,7 @@
         }
     };
 
+    // Append all built options to the current menu
     context.loadMenu = function(init) {
         var i = 0,
             dequeuedMenu;
@@ -209,12 +224,14 @@
             this.addOption(this.options[i], init);
         }
 
+        // Setting the with with data in order to avoid display: none bug while opening the menu
         if (init) {
             $mainMenu.data("width", $mainMenu.width());
         } else {
             $currentMenu.data("width", $currentMenu.width());
         }
 
+        // Continue building the enqueued menus, if any (BFS)
         if (!menus.isEmpty()) {
             dequeuedMenu = menus.dequeue();
 
@@ -227,8 +244,9 @@
     };
 
 
-    // On RMB click functions
+    // >> On RMB click functions
 
+    // Determines the directions of the menu according to the cursor position
     context.determineDirections = function(page) {
         var windowX = $(window).innerWidth(),
             windowY = $(window).innerHeight(),
@@ -252,7 +270,7 @@
         return directions;
     };
 
-    // Applies new position on RMB click
+    // Applies the new position on RMB click
     context.positionMenu = function(page) {
         var mainMenu = {},
             directions;
@@ -287,7 +305,8 @@
         });
     };
 
-    // Plugin
+
+    // PLUGIN
     $.fn.jqCtxMenu = function(options) {
         var $this = $(this),
             isInitSet = false;
@@ -299,8 +318,8 @@
 
         context.buildMenu(true);
         context.loadMenu(true);
-        context.finalizeSetting();
         context.determineTotalWidth();
+        context.finalizeSetting();
 
         // Disable the default context menu
         $this.bind("contextmenu", function() {
